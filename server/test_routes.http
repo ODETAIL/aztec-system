@@ -1,0 +1,13 @@
+POST http://localhost:5001/auth/register HTTP/1.1
+content-type: application/json
+
+{
+    "firstName": "Misael",
+	"lastName": "Esperanzate",
+	"emailAddress": "misael.esperanzate@hotmail.com",
+	"password": "password123",
+	"city": "chestermere",
+	"postalCode": "T1X0G5",
+	"phoneNumber": "4036152718",
+	"role": "admin"
+}
