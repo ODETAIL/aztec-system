@@ -14,7 +14,16 @@ const AppointmentSchema = new mongoose.Schema(
 		},
 		start: Date,
 		end: Date,
-		description: String,
+		extendedProps: {
+			firstName: String,
+			lastName: String,
+			email: String,
+			phoneNumber: String,
+			code: String,
+			vtype: String,
+			price: String,
+			notes: String,
+		},
 	},
 	{ timestamps: true }
 );

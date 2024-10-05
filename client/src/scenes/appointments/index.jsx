@@ -10,6 +10,7 @@ import Form from "./Form";
 import {
 	Box,
 	Button,
+	IconButton,
 	List,
 	ListItem,
 	ListItemText,
@@ -18,8 +19,13 @@ import {
 	useTheme,
 } from "@mui/material";
 import Header from "components/Header";
-import { PersonAddAlt1Outlined } from "@mui/icons-material";
-import { useAddAppointmentMutation, useGetAppointmentsQuery } from "state/api";
+import { CloseOutlined, PersonAddAlt1Outlined } from "@mui/icons-material";
+import {
+	useAddAppointmentMutation,
+	useDeleteAppointmentMutation,
+	useGetAppointmentsQuery,
+	useUpdateAppointmentMutation,
+} from "state/api";
 
 const Appointments = () => {
 	const theme = useTheme();
@@ -29,6 +35,8 @@ const Appointments = () => {
 
 	const [openModal, setOpenModal] = useState(false);
 	const [addAppointment] = useAddAppointmentMutation();
+	const [deleteAppointment] = useDeleteAppointmentMutation();
+	const [updateAppointment] = useUpdateAppointmentMutation();
 	const { data, isLoading } = useGetAppointmentsQuery({
 		currentEvents,
 	});
@@ -37,14 +45,49 @@ const Appointments = () => {
 		const appointmentApi = calendarRef.current.getApi();
 		appointmentApi.addEvent({
 			...event,
+			title: event.title,
 			start: event.start.toDate(),
 			end: event.end.toDate(),
 		});
-		setOpenModal(!openModal);
+		setOpenModal(false);
 	};
 
 	const handleAppointmentAdd = async (data) => {
 		await addAppointment(data.event).unwrap();
+	};
+
+	const handleAppointmentDrop = async (info) => {
+		// Update the event with the new date/time
+		const updatedEvent = currentEvents.find(
+			(event) => event.extendedProps._id === info.event.extendedProps._id
+		);
+
+		if (updatedEvent) {
+			const modifiedEvent = {
+				...updatedEvent, // Preserve the original event properties
+				start: info.event.start.toISOString(), // Update the start time
+				end: info.event.end ? info.event.end.toISOString() : null, // Update the end time
+			};
+
+			// Update the state with the modified event
+			setCurrentEvents((prevEvents) =>
+				prevEvents.map((event) =>
+					event.extendedProps._id === modifiedEvent.extendedProps._id
+						? modifiedEvent
+						: event
+				)
+			);
+
+			console.log(modifiedEvent);
+			await updateAppointment({
+				_id: info.event.extendedProps._id,
+				data: modifiedEvent,
+			});
+		}
+	};
+
+	const handleDeleteAppointment = async (props) => {
+		await deleteAppointment(props.extendedProps._id);
 	};
 
 	const setAppointments = (events) => {
@@ -53,14 +96,27 @@ const Appointments = () => {
 			title: event.title,
 			start: event.start.toISOString(),
 			end: event.end.toISOString(),
-			description: event.description,
-			extendedProps: { ...event.extendedProps },
+			extendedProps: event.extendedProps,
 		}));
-		console.log(events);
+
 		setCurrentEvents(serializableEvents);
 	};
 
-	// const handleEventClick = () => {};
+	const handleEventClick = (eventClickInfo) => {
+		const { title, start, end, extendedProps } = eventClickInfo.event;
+		alert(`
+			Title: ${title}
+			Start: ${start.toLocaleString()}
+			End: ${end ? end.toLocaleString() : "N/A"}
+			Customer Name: ${extendedProps.firstName} ${extendedProps.lastName}
+			Code: ${extendedProps.code}
+			Vehicle Type: ${extendedProps.vtype}
+			Email: ${extendedProps.email}
+			Phone Number: ${extendedProps.phoneNumber}
+			Price: ${extendedProps.price}
+			Notes: ${extendedProps.notes}
+		`);
+	};
 
 	return (
 		<Box m="1.5rem 2.5rem">
@@ -93,32 +149,44 @@ const Appointments = () => {
 					</Box>
 
 					<List>
-						{currentEvents.map((event) => (
-							<ListItem
-								key={event.id}
-								sx={{
-									backgroundColor:
-										theme.palette.secondary[300],
-									margin: "10px 0",
-									borderRadius: "2px",
-									color: theme.palette.primary[600],
-									cursor: "pointer",
-								}}
-							>
-								<ListItemText
-									primary={event.title}
-									secondary={
-										<Typography>
-											{formatDate(event.start, {
-												year: "numeric",
-												month: "short",
-												day: "numeric",
-											})}
-										</Typography>
-									}
-								/>
-							</ListItem>
-						))}
+						{currentEvents
+							.filter(
+								(event) => new Date(event.start) >= new Date()
+							)
+							.map((event) => (
+								<ListItem
+									key={event.id}
+									sx={{
+										backgroundColor:
+											theme.palette.secondary[300],
+										margin: "10px 0",
+										borderRadius: "2px",
+										color: theme.palette.primary[600],
+									}}
+								>
+									<ListItemText
+										primary={event.title}
+										secondary={
+											<Typography>
+												{formatDate(event.start, {
+													year: "numeric",
+													month: "short",
+													day: "numeric",
+												})}
+											</Typography>
+										}
+									/>
+									<IconButton
+										size="small"
+										onClick={() =>
+											handleDeleteAppointment(event)
+										}
+										sx={{ color: theme.palette.error.main }}
+									>
+										<CloseOutlined />
+									</IconButton>
+								</ListItem>
+							))}
 					</List>
 				</Box>
 
@@ -140,15 +208,16 @@ const Appointments = () => {
 							right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
 						}}
 						initialView="dayGridMonth"
-						// editable={true}
+						editable={true}
 						// selectable={true}
 						selectMirror={true}
 						dayMaxEvents={true}
-						// eventClick={handleEventClick}
+						eventClick={handleEventClick}
 						eventDisplay="block"
 						events={isLoading ? {} : data}
 						eventAdd={(event) => handleAppointmentAdd(event)}
 						eventsSet={(events) => setAppointments(events)}
+						eventDrop={(event) => handleAppointmentDrop(event)}
 						eventBackgroundColor={theme.palette.secondary[300]}
 						eventTextColor={theme.palette.primary[600]}
 					/>

@@ -27,12 +27,6 @@ const Invoices = () => {
 			flex: 0.5,
 		},
 		{
-			field: "_id",
-			headerName: "ID",
-			flex: 0.5,
-		},
-
-		{
 			field: "status",
 			headerName: "Status",
 			flex: 0.5,

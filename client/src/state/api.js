@@ -31,6 +31,7 @@ export const api = createApi({
 			}),
 			providesTags: ["Appointments"],
 		}),
+
 		getInvoices: build.query({
 			query: ({ search }) => ({
 				url: `client/invoices`,
@@ -47,6 +48,36 @@ export const api = createApi({
 				body: newCustomer,
 			}),
 			invalidatesTags: ["Customers"],
+		}),
+		deleteCustomer: build.mutation({
+			query: (id) => ({
+				url: `client/customers/${id}`,
+				method: "DELETE",
+			}),
+			invalidatesTags: ["Customers"],
+		}),
+		updateCustomer: build.mutation({
+			query: (params) => ({
+				url: `client/customers/${params._id}`,
+				method: "PUT",
+				body: params.data,
+			}),
+			invalidatesTags: ["Customers"],
+		}),
+		updateAppointment: build.mutation({
+			query: (params) => ({
+				url: `client/appointments/${params._id}`,
+				method: "PUT",
+				body: params.data,
+			}),
+			invalidatesTags: ["Appointments"],
+		}),
+		deleteAppointment: build.mutation({
+			query: (id) => ({
+				url: `client/appointments/${id}`,
+				method: "DELETE",
+			}),
+			invalidatesTags: ["Appointments"],
 		}),
 		addAppointment: build.mutation({
 			query: (newAppointment) => ({
@@ -66,4 +97,8 @@ export const {
 	useGetAppointmentsQuery,
 	useAddCustomerMutation,
 	useAddAppointmentMutation,
+	useDeleteCustomerMutation,
+	useUpdateCustomerMutation,
+	useUpdateAppointmentMutation,
+	useDeleteAppointmentMutation,
 } = api;

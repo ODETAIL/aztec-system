@@ -5,22 +5,18 @@ import Header from "components/Header";
 import { DataGrid } from "@mui/x-data-grid";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
 import Form from "./Form";
+import Actions from "actions";
 
 const Customers = () => {
 	const theme = useTheme();
 	const [search, setSearch] = useState("");
 	const [searchInput, setSearchInput] = useState("");
-	const [openModel, setOpenModal] = useState(false);
+	const [openModal, setOpenModal] = useState(false);
 	const { data, isLoading } = useGetCustomersQuery({
 		search,
 	});
 
 	const columns = [
-		{
-			field: "_id",
-			headerName: "ID",
-			flex: 1,
-		},
 		{
 			field: "firstName",
 			headerName: "First Name",
@@ -51,6 +47,20 @@ const Customers = () => {
 			field: "lastVisit",
 			headerName: "Last Visited",
 			flex: 0.5,
+		},
+		{
+			field: "actions",
+			headerName: "Actions",
+			flex: 0.5,
+			renderCell: (params) => {
+				return (
+					<Actions
+						params={params.row}
+						setOpenModal={setOpenModal}
+						openModal={openModal}
+					/>
+				);
+			},
 		},
 	];
 	return (
@@ -88,6 +98,9 @@ const Customers = () => {
 					"& .MuiDataGrid-toolbarContainer .MuiButton-text": {
 						color: `${theme.palette.secondary[200]} !important`,
 					},
+					"& .Mui-checked": {
+						color: `${theme.palette.secondary[200]} !important`,
+					},
 				}}
 			>
 				<DataGrid
@@ -95,19 +108,21 @@ const Customers = () => {
 					getRowId={(row) => row._id}
 					rows={data || []}
 					columns={columns}
-					slots={{ toolbar: DataGridCustomToolbar }}
+					slots={{
+						toolbar: DataGridCustomToolbar,
+					}}
 					slotProps={{
 						toolbar: {
 							searchInput,
 							setSearchInput,
 							setSearch,
 							setOpenModal,
-							openModel,
+							openModal,
 						},
 					}}
 				/>
-				{openModel && (
-					<Form setOpenModal={setOpenModal} openModal={openModel} />
+				{openModal && (
+					<Form setOpenModal={setOpenModal} openModal={openModal} />
 				)}
 			</Box>
 		</Box>

@@ -1,8 +1,10 @@
 import Appointment from "../models/Appointment.js";
 import Customer from "../models/Customer.js";
-import moment from "moment";
 import Invoice from "../models/Invoice.js";
 
+/**
+ * Customer related controllers such retrieving/adding/deleting/modifying
+ */
 export const getCustomers = async (req, res) => {
 	try {
 		const customers = await Customer.find();
@@ -65,6 +67,34 @@ export const addCustomer = async (req, res) => {
 	}
 };
 
+export const deleteCustomer = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const customer = await Customer.findByIdAndDelete(id);
+		res.status(200).json({ success: true, message: { customer } });
+	} catch (error) {
+		res.status(404).json({ message: error.message });
+	}
+};
+
+export const editCustomer = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const updatedData = req.body;
+		const updatedCustomer = await Customer.findByIdAndUpdate(
+			id,
+			updatedData,
+			{ new: true, runValidators: true }
+		);
+		res.status(200).json({ success: true, message: { updatedCustomer } });
+	} catch (error) {
+		res.status(404).json({ message: error.message });
+	}
+};
+
+/**
+ * Appointment related controllers such retrieving/adding/deleting/modifying
+ */
 export const getAppointments = async (req, res) => {
 	try {
 		const appointments = await Appointment.find();
@@ -76,12 +106,12 @@ export const getAppointments = async (req, res) => {
 
 export const addAppointment = async (req, res) => {
 	try {
-		const { start, end, title, description } = req.body;
+		const { start, end, title, extendedProps } = req.body;
 		const newAppointment = new Appointment({
 			start,
 			end,
 			title,
-			description,
+			extendedProps,
 		});
 
 		const savedAppointment = await newAppointment.save();
@@ -91,6 +121,37 @@ export const addAppointment = async (req, res) => {
 	}
 };
 
+export const editAppointment = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const updatedData = req.body;
+		const updatedAppointment = await Appointment.findByIdAndUpdate(
+			id,
+			updatedData,
+			{ new: true, runValidators: true }
+		);
+		res.status(200).json({
+			success: true,
+			message: { updatedAppointment },
+		});
+	} catch (error) {
+		res.status(404).json({ message: error.message });
+	}
+};
+
+export const deleteAppointment = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const appointment = await Appointment.findByIdAndDelete(id);
+		res.status(200).json({ success: true, message: { appointment } });
+	} catch (error) {
+		res.status(404).json({ message: error.message });
+	}
+};
+
+/**
+ * Invoices related controllers such retrieving/adding/deleting/modifying
+ */
 export const getInvoices = async (req, res) => {
 	try {
 		const { search = "" } = req.query;

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { useAddCustomerMutation } from "state/api";
+import { useAddCustomerMutation, useUpdateCustomerMutation } from "state/api";
 
 const newCustomerSchema = yup.object().shape({
 	firstName: yup.string().required("required"),
@@ -29,29 +29,41 @@ const newCustomerSchema = yup.object().shape({
 	delete: yup.boolean(),
 });
 
-const initialValueNewCustomer = {
-	firstName: "",
-	lastName: "",
-	emailAddress: "",
-	streetAddress1: "",
-	streetAddress2: "",
-	city: "",
-	postalCode: "",
-	memo: "",
-	phoneNumber: "",
-	companyName: "",
-	transactionCount: "",
-	totalSpend: "",
-	delete: false,
-};
+const Form = ({ setOpenModal, openModal, existingCustomer }) => {
+	let isEditing = Boolean(existingCustomer);
 
-const Form = ({ setOpenModal, openModal }) => {
+	const initialValueNewCustomer = {
+		firstName: existingCustomer?.firstName || "",
+		lastName: existingCustomer?.lastName || "",
+		emailAddress: existingCustomer?.emailAddress || "",
+		streetAddress1: existingCustomer?.streetAddress1 || "",
+		streetAddress2: existingCustomer?.streetAddress2 || "",
+		city: existingCustomer?.city || "",
+		postalCode: existingCustomer?.postalCode || "",
+		memo: existingCustomer?.memo || "",
+		phoneNumber: existingCustomer?.phoneNumber || "",
+		companyName: existingCustomer?.companyName || "",
+		transactionCount: existingCustomer?.transactionCount || "",
+		totalSpend: existingCustomer?.totalSpend || "",
+		delete: existingCustomer?.delete || false,
+	};
+
 	const { palette } = useTheme();
 	const isNonMobile = useMediaQuery("(min-width: 600px)");
 	const [addCustomer] = useAddCustomerMutation();
+	const [updateCustomer] = useUpdateCustomerMutation();
 
 	const handleFormSubmit = async (values, onSubmitProps) => {
-		await addCustomer(values).unwrap();
+		if (isEditing) {
+			await updateCustomer({
+				_id: existingCustomer._id,
+				data: values,
+			});
+
+			isEditing = false;
+		} else {
+			await addCustomer(values).unwrap();
+		}
 		onSubmitProps.resetForm();
 		setOpenModal(false);
 	};
@@ -61,6 +73,7 @@ const Form = ({ setOpenModal, openModal }) => {
 			onSubmit={handleFormSubmit}
 			initialValues={initialValueNewCustomer}
 			validationSchema={newCustomerSchema}
+			enableReinitialize
 		>
 			{({
 				values,
@@ -73,7 +86,9 @@ const Form = ({ setOpenModal, openModal }) => {
 				return (
 					<Dialog
 						open={openModal}
-						onClose={() => setOpenModal(false)}
+						onClose={() => {
+							setOpenModal(false);
+						}}
 						sx={{
 							"& .MuiPaper-root": {
 								backgroundColor: palette.background.alt,
@@ -296,7 +311,7 @@ const Form = ({ setOpenModal, openModal }) => {
 											},
 										}}
 									>
-										ADD
+										{isEditing ? "UPDATE" : "ADD"}
 									</Button>
 								</Box>
 							</form>

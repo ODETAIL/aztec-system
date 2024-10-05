@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
 	Box,
 	Button,
@@ -8,6 +8,11 @@ import {
 	useTheme,
 	Dialog,
 	DialogContent,
+	Select,
+	InputLabel,
+	MenuItem,
+	FormControl,
+	CircularProgress,
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 
@@ -15,31 +20,51 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
 import { Formik } from "formik";
 import * as yup from "yup";
+import { useGetCustomersQuery } from "state/api";
 
 const newAppointmentSchema = yup.object().shape({
 	title: yup.string().required("required"),
 	start: yup.date().required("required"),
 	end: yup.date().required("required"),
-	description: yup.string(),
+	firstName: yup.string(),
+	lastName: yup.string(),
+	code: yup.string().required("required"),
+	email: yup.string().email("invalid email").required("required"),
+	phoneNumber: yup.string(),
+	vtype: yup.string(),
+	price: yup.string(),
+	notes: yup.string(),
 });
 
 const initialValueNewAppointment = {
 	title: "",
 	start: null,
 	end: null,
-	description: "",
+	firstName: "",
+	lastName: "",
+	code: "",
+	email: "",
+	phoneNumber: "",
+	vtype: "",
+	price: "",
+	notes: "",
 };
 
+const vehicleType = ["Suv", "Truck", "Sedan", "Minivan"];
+
 const Form = ({ setOpenModal, openModal, onAppointmentAdded }) => {
+	const [selectedCustomer, setSelectedCustomer] = useState("");
+	const [selectedType, setSelectedType] = useState("");
 	const { palette } = useTheme();
 	const isNonMobile = useMediaQuery("(min-width: 600px)");
+	const { data, isLoading } = useGetCustomersQuery({ search: "" });
 
 	const handleFormSubmit = async (values, onSubmitProps) => {
-		console.log(values);
 		onAppointmentAdded(values);
 		onSubmitProps.resetForm();
 		setOpenModal(false);
 	};
+
 	return (
 		<Formik
 			onSubmit={handleFormSubmit}
@@ -153,19 +178,253 @@ const Form = ({ setOpenModal, openModal, onAppointmentAdded }) => {
 												gridColumn: "span 2",
 											}}
 										/>
+
+										<FormControl
+											fullWidth
+											sx={{ gridColumn: "span 2" }}
+											error={
+												Boolean(touched.firstName) &&
+												Boolean(errors.firstName) &&
+												Boolean(touched.lastName) &&
+												Boolean(errors.lastName)
+											}
+										>
+											<InputLabel id="customer-label">
+												Customer Name
+											</InputLabel>
+											{isLoading ? (
+												<CircularProgress />
+											) : (
+												<Select
+													labelId="customer-label"
+													name="name"
+													onBlur={handleBlur}
+													onChange={(event) => {
+														const value =
+															event.target.value;
+
+														const [
+															firstName,
+															lastName,
+														] = value.split(" ");
+														setFieldValue(
+															"firstName",
+															firstName,
+															true
+														);
+														setFieldValue(
+															"lastName",
+															lastName,
+															true
+														);
+														setSelectedCustomer(
+															value
+														);
+													}}
+													value={selectedCustomer}
+													MenuProps={{
+														PaperProps: {
+															style: {
+																backgroundColor:
+																	palette
+																		.primary[600], // Change dropdown background color
+																color: palette
+																	.secondary[100], // Change dropdown text color
+																maxHeight: 250,
+															},
+														},
+														anchorOrigin: {
+															vertical: "bottom",
+															horizontal: "left",
+														},
+														transformOrigin: {
+															vertical: "top",
+															horizontal: "left",
+														},
+													}}
+												>
+													<MenuItem
+														value="addNew"
+														sx={{
+															backgroundColor:
+																palette
+																	.primary[600],
+															"&:hover": {
+																backgroundColor:
+																	"none",
+															},
+
+															color: palette
+																.secondary[100],
+														}}
+													>
+														Add New Customer
+													</MenuItem>
+													{/* List customers */}
+													{data?.map((customer) => (
+														<MenuItem
+															key={customer._id}
+															value={`${customer.firstName} ${customer.lastName}`}
+														>
+															{`${customer.firstName} ${customer.lastName}`}
+														</MenuItem>
+													))}
+												</Select>
+											)}
+
+											{/* Display error if there is one */}
+											{touched.firstName &&
+												errors.firstName &&
+												touched.lastName &&
+												errors.lastName}
+										</FormControl>
+										<FormControl
+											fullWidth
+											sx={{ gridColumn: "span 2" }}
+											error={
+												Boolean(touched.type) &&
+												Boolean(errors.type)
+											}
+										>
+											<InputLabel id="vtype-label">
+												Vehicle Type
+											</InputLabel>
+											{
+												<Select
+													labelId="vtype-label"
+													name="vtype"
+													onBlur={handleBlur}
+													onChange={(event) => {
+														setFieldValue(
+															"vtype",
+															event.target.value,
+															true
+														);
+														setSelectedType(
+															event.target.value
+														);
+													}}
+													value={selectedType}
+													MenuProps={{
+														PaperProps: {
+															style: {
+																backgroundColor:
+																	palette
+																		.primary[600], // Change dropdown background color
+																color: palette
+																	.secondary[100], // Change dropdown text color
+																maxHeight: 250,
+															},
+														},
+														anchorOrigin: {
+															vertical: "bottom",
+															horizontal: "left",
+														},
+														transformOrigin: {
+															vertical: "top",
+															horizontal: "left",
+														},
+													}}
+												>
+													{/* List vehicle type */}
+													{vehicleType?.map(
+														(vtype, index) => (
+															<MenuItem
+																key={index}
+																value={vtype}
+															>
+																{vtype}
+															</MenuItem>
+														)
+													)}
+												</Select>
+											}
+
+											{/* Display error if there is one */}
+											{touched.type && errors.type}
+										</FormControl>
+
+										<TextField
+											label="Code"
+											onBlur={handleBlur}
+											onChange={handleChange}
+											value={values.code ?? ""}
+											name="code"
+											error={
+												Boolean(touched.code) &&
+												Boolean(errors.code)
+											}
+											helperText={
+												touched.code && errors.code
+											}
+											sx={{
+												gridColumn: "span 2",
+											}}
+										/>
+										<TextField
+											label="Email"
+											onBlur={handleBlur}
+											onChange={handleChange}
+											value={values.email ?? ""}
+											name="email"
+											error={
+												Boolean(touched.email) &&
+												Boolean(errors.email)
+											}
+											helperText={
+												touched.email && errors.email
+											}
+											sx={{
+												gridColumn: "span 2",
+											}}
+										/>
+										<TextField
+											label="Phone Number"
+											onBlur={handleBlur}
+											onChange={handleChange}
+											value={values.phoneNumber ?? ""}
+											name="phoneNumber"
+											error={
+												Boolean(touched.phoneNumber) &&
+												Boolean(errors.phoneNumber)
+											}
+											helperText={
+												touched.phoneNumber &&
+												errors.phoneNumber
+											}
+											sx={{
+												gridColumn: "span 2",
+											}}
+										/>
+										<TextField
+											label="Price"
+											onBlur={handleBlur}
+											onChange={handleChange}
+											value={values.price ?? ""}
+											name="price"
+											error={
+												Boolean(touched.price) &&
+												Boolean(errors.price)
+											}
+											helperText={
+												touched.price && errors.price
+											}
+											sx={{
+												gridColumn: "span 2",
+											}}
+										/>
 										<TextField
 											label="Notes"
 											onBlur={handleBlur}
 											onChange={handleChange}
-											value={values.description ?? ""}
-											name="description"
+											value={values.notes ?? ""}
+											name="notes"
 											error={
-												Boolean(touched.description) &&
-												Boolean(errors.description)
+												Boolean(touched.notes) &&
+												Boolean(errors.notes)
 											}
 											helperText={
-												touched.description &&
-												errors.description
+												touched.notes && errors.notes
 											}
 											sx={{
 												gridColumn: "span 4",
