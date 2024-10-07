@@ -10,6 +10,8 @@ import Customers from "scenes/customers";
 import Login from "scenes/login";
 import Appointments from "scenes/appointments";
 import Invoices from "scenes/invoices";
+import Monthly from "scenes/monthly";
+import Overall from "scenes/overall";
 
 const App = () => {
 	const mode = useSelector((state) => state.auth.mode);
@@ -50,6 +52,18 @@ const App = () => {
 								path="/invoices"
 								element={
 									isAuth ? <Invoices /> : <Navigate to="/" />
+								}
+							/>
+							<Route
+								path="/overview"
+								element={
+									isAuth ? <Overall /> : <Navigate to="/" />
+								}
+							/>
+							<Route
+								path="/monthly"
+								element={
+									isAuth ? <Monthly /> : <Navigate to="/" />
 								}
 							/>
 						</Route>

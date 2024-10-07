@@ -70,6 +70,7 @@ const csvToObjects = (csv) => {
 			labourAmount: values[14].trim().replace(/[^0-9.-]+/g, ""),
 			totalWindshields: values[15].trim(),
 			transactionCount: values[16].trim(), // Assuming the last column "40" is a transaction count or some metric
+			status: "Paid",
 			delete: false, // Default field for deletion flag
 		};
 	});

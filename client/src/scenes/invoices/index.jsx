@@ -30,6 +30,29 @@ const Invoices = () => {
 			field: "status",
 			headerName: "Status",
 			flex: 0.5,
+			renderCell: ({ row: { status } }) => {
+				return (
+					<Box
+						width="40%"
+						height="50%"
+						m="0.75rem auto"
+						p="5px"
+						display="flex"
+						justifyContent="center"
+						alignItems="center"
+						backgroundColor={
+							status === "Paid"
+								? theme.palette.success.main
+								: theme.palette.error.main
+						}
+						borderRadius="10px"
+					>
+						<Typography color={theme.palette.secondary[100]}>
+							{status}
+						</Typography>
+					</Box>
+				);
+			},
 		},
 		{
 			field: "code",
@@ -41,9 +64,16 @@ const Invoices = () => {
 			headerName: "Amount",
 			flex: 0.5,
 			renderCell: (params) => (
-				<Typography color={theme.palette.secondary[100]}>
-					{params.row.amount ? `$${params.row.amount}` : ""}
-				</Typography>
+				<Box
+					display="flex"
+					justifyContent="center" // Center content
+					width="100%"
+					m="1rem auto"
+				>
+					<Typography color={theme.palette.secondary[100]}>
+						{params.row.amount ? `$${params.row.amount}` : ""}
+					</Typography>
+				</Box>
 			),
 		},
 	];

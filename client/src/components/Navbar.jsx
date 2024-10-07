@@ -9,7 +9,7 @@ import {
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import { useDispatch } from "react-redux";
-import { setMode } from "state";
+import { setLogout, setMode } from "state";
 import profileImage from "assets/aztec_logo_2.jpeg";
 import {
 	AppBar,
@@ -23,15 +23,24 @@ import {
 	Typography,
 	useTheme,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
 	const dispatch = useDispatch();
 	const theme = useTheme();
+	const navigate = useNavigate();
 
 	const [anchorEl, setAnchorEl] = useState(null);
 	const isOpen = Boolean(anchorEl);
 	const handleClick = (event) => setAnchorEl(event.currentTarget);
-	const handleClose = () => setAnchorEl(null);
+
+	const handleClose = () => {
+		setAnchorEl(null);
+
+		localStorage.removeItem("token");
+		dispatch(setLogout());
+		navigate("/"); // Redirect the user to the login page
+	};
 
 	return (
 		<AppBar

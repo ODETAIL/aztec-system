@@ -14,8 +14,9 @@ import authRoutes from "./routes/auth.js";
 // data imports
 // import User from "./models/User.js";
 // import Customer from "./models/Customer.js";
-// import { dataInvoice, dataUser } from "./data/index.js";
+// import { dataInvoice, dataUser, dataOverallSales } from "./data/index.js";
 // import Invoice from "./models/Invoice.js";
+// import OverallSales from "./models/OverallSales.js";
 
 /* CONFIGURATION */
 dotenv.config();
@@ -45,5 +46,6 @@ mongoose
 
 		/* ONLY ADD DATA ONE TIME */
 		// Invoice.insertMany(dataInvoice);
+		// OverallSales.insertMany(dataOverallSales);
 	})
 	.catch((error) => console.log(`${error} did not connect`));

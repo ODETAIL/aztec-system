@@ -12,6 +12,7 @@ import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "state";
+import { useLoginUserMutation, useRegisterUserMutation } from "state/api";
 
 const registerSchema = yup.object().shape({
 	firstName: yup.string().required("required"),
@@ -47,6 +48,8 @@ const initialValueLogin = {
 
 const Form = () => {
 	const [pageType, setPageType] = useState("login");
+	const [registerUser] = useRegisterUserMutation();
+	const [loginUser] = useLoginUserMutation();
 	const { palette } = useTheme();
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -55,43 +58,33 @@ const Form = () => {
 	const isRegister = pageType === "register";
 
 	const register = async (values, onSubmitProps) => {
-		const savedUserResponse = await fetch(
-			`${process.env.REACT_APP_BASE_URL}/auth/register`,
-			{
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(values),
+		try {
+			const savedUser = await registerUser(values).unwrap(); // Use mutation
+			onSubmitProps.resetForm();
+			if (savedUser) {
+				// Navigate to login page or handle success logic
+				setPageType("login");
 			}
-		);
-
-		const savedUser = await savedUserResponse.json();
-
-		onSubmitProps.resetForm();
-
-		if (savedUser) {
-			setPageType("login");
+		} catch (error) {
+			console.error("Registration error:", error);
 		}
 	};
 
 	const login = async (values, onSubmitProps) => {
-		const loggedInResponse = await fetch(
-			`${process.env.REACT_APP_BASE_URL}/auth/login`,
-			{
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(values),
+		try {
+			const loggedIn = await loginUser(values).unwrap(); // Use mutation
+			onSubmitProps.resetForm();
+			if (loggedIn) {
+				dispatch(
+					setLogin({
+						user: loggedIn.user,
+						token: loggedIn.token,
+					})
+				);
+				navigate("/dashboard"); // Navigate to dashboard
 			}
-		);
-		const loggedIn = await loggedInResponse.json();
-		onSubmitProps.resetForm();
-		if (loggedIn) {
-			dispatch(
-				setLogin({
-					user: loggedIn.user,
-					token: loggedIn.token,
-				})
-			);
-			navigate("/dashboard");
+		} catch (error) {
+			console.error("Login error:", error);
 		}
 	};
 
