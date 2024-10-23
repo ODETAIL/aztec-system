@@ -5,6 +5,7 @@ import App from "./App";
 
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authReducer from "state";
+import invoiceReducer from "state/invoice";
 import { Provider } from "react-redux";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import {
@@ -23,6 +24,7 @@ import { api } from "state/api/api";
 
 const rootReducer = combineReducers({
 	auth: authReducer, // Combine auth reducer
+	invoice: invoiceReducer,
 	[api.reducerPath]: api.reducer, // Combine api reducer
 });
 

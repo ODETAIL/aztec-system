@@ -11,6 +11,8 @@ import {
 	editCustomer,
 	editAppointment,
 	deleteAppointment,
+	editInvoice,
+	deleteInvoice,
 } from "../controllers/client.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -25,14 +27,16 @@ router.get("/invoices", verifyToken, getInvoices);
 /* DELETE */
 router.delete("/customers/:id", verifyToken, deleteCustomer);
 router.delete("/appointments/:id", verifyToken, deleteAppointment);
+router.delete("/invoices/:id", verifyToken, deleteInvoice);
 
 /* CREATE */
 router.post("/new", verifyToken, addCustomer);
 router.post("/new-appointment", verifyToken, addAppointment);
-router.post("/new-invoice/:id", verifyToken, addInvoice);
+router.post("/new-invoice", verifyToken, addInvoice);
 
 /* UPDATE */
 router.put("/customers/:id", verifyToken, editCustomer);
 router.put("/appointments/:id", verifyToken, editAppointment);
+router.put("/invoices/:id", verifyToken, editInvoice);
 
 export default router;

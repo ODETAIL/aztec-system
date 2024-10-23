@@ -5,13 +5,17 @@ import mongoose from "mongoose";
  */
 
 const ServiceSchema = new mongoose.Schema({
+	vehicleType: {
+		type: String,
+		required: true,
+	},
 	name: {
 		type: String,
 		required: true,
 		min: 2,
 		max: 100,
 	},
-	amount: {
+	price: {
 		type: String,
 		required: true,
 	},
@@ -19,31 +23,21 @@ const ServiceSchema = new mongoose.Schema({
 
 const InvoiceSchema = new mongoose.Schema(
 	{
-		date: String,
+		invoiceNumber: String,
+		invoiceDate: String,
 		customer: String,
-		vehicle: String,
+		year: String,
+		makemodel: String,
+		invoiceType: String, // A/M/O
 		code: {
 			type: String,
 			require: true,
 		},
-		job: String,
-		sensors: String,
 		costBeforeGST: String,
 		costAfterGST: String,
-		materials: String,
-		gas: String,
-		gstOnJob: String,
-		fees: String,
 		formOfPayment: String,
-		labourAmount: String,
-		totalWindshields: String,
-		transactionCount: String,
 		delete: Boolean,
-
 		status: {
-			type: String,
-		},
-		amount: {
 			type: String,
 		},
 		service: {

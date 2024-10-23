@@ -4,12 +4,17 @@ import { useGetInvoicesQuery } from "state/api";
 import Header from "components/Header";
 import { DataGrid } from "@mui/x-data-grid";
 import DataGridCustomToolbar from "components/DataGridCustomToolbar";
+import Actions from "./Actions";
+import { formatName } from "utilities/helpers";
+import Form from "./Form";
 
 const Invoices = () => {
 	const theme = useTheme();
+
 	const [search, setSearch] = useState("");
 	const [searchInput, setSearchInput] = useState("");
-	const [openModel, setOpenModal] = useState(false);
+	const [openModal, setOpenModal] = useState(false);
+
 	const { data, isLoading } = useGetInvoicesQuery({
 		search,
 	});
@@ -25,6 +30,20 @@ const Invoices = () => {
 			field: "customer",
 			headerName: "Customer",
 			flex: 0.5,
+			renderCell: (params) => (
+				<Box
+					display="flex"
+					// justifyContent="center" // Center content
+					width="100%"
+					m="1rem auto"
+				>
+					<Typography color={theme.palette.secondary[100]}>
+						{params.row.customer
+							? `${formatName(params.row.customer)}`
+							: ""}
+					</Typography>
+				</Box>
+			),
 		},
 		{
 			field: "status",
@@ -42,12 +61,39 @@ const Invoices = () => {
 						alignItems="center"
 						backgroundColor={
 							status === "Paid"
-								? theme.palette.success.main
-								: theme.palette.error.main
+								? "#33d69f0f" // Green for "Paid"
+								: status === "Overdue"
+								? theme.palette.error.main // Red for "Overdue"
+								: status === "Draft"
+								? "#dfe3fa0f" // Grey for "Draft"
+								: "#f0c9290f" // Yellow for "Unpaid"
 						}
 						borderRadius="10px"
 					>
-						<Typography color={theme.palette.secondary[100]}>
+						<Box
+							width="10px"
+							height="10px"
+							borderRadius="50%"
+							backgroundColor={
+								status === "Paid"
+									? "#33d69f0f" // Green for "Paid"
+									: status === "Overdue"
+									? theme.palette.error.main // Red for "Overdue"
+									: status === "Draft"
+									? "#dfe3fa0f" // Grey for "Draft"
+									: "#f0c9290f" // Yellow for "Unpaid"
+							}
+							mr="5px"
+						/>
+						<Typography
+							color={
+								status === "Paid"
+									? "#33d69f"
+									: status === "Overdue"
+									? theme.palette.error.main
+									: "ff8f00"
+							}
+						>
 							{status}
 						</Typography>
 					</Box>
@@ -71,10 +117,26 @@ const Invoices = () => {
 					m="1rem auto"
 				>
 					<Typography color={theme.palette.secondary[100]}>
-						{params.row.amount ? `$${params.row.amount}` : ""}
+						{params.row.amount || params.row.price
+							? `$${params.row.amount || params.row.price}`
+							: ""}
 					</Typography>
 				</Box>
 			),
+		},
+		{
+			field: "actions",
+			headerName: "Actions",
+			flex: 0.5,
+			renderCell: (params) => {
+				return (
+					<Actions
+						params={params.row}
+						setOpenModal={setOpenModal}
+						openModal={openModal}
+					/>
+				);
+			},
 		},
 	];
 	return (
@@ -92,15 +154,15 @@ const Invoices = () => {
 					},
 					"& .MuiDataGrid-columnHeaders": {
 						"--DataGrid-containerBackground":
-							theme.palette.background.alt,
+							theme.palette.primary[700],
 						color: theme.palette.secondary[100],
 						borderBottom: "none",
 					},
 					"& .MuiDataGrid-virtualScroller": {
-						backgroundColor: theme.palette.primary.light,
+						backgroundColor: theme.palette.primary[600],
 					},
 					"& .MuiDataGrid-footerContainer": {
-						backgroundColor: theme.palette.background.alt,
+						backgroundColor: theme.palette.primary[700],
 						color: theme.palette.secondary[100],
 						borderTop: "none",
 					},
@@ -121,10 +183,13 @@ const Invoices = () => {
 							setSearchInput,
 							setSearch,
 							setOpenModal,
-							openModel,
+							openModal,
 						},
 					}}
 				/>
+				{openModal && (
+					<Form setOpenModal={setOpenModal} openModal={openModal} />
+				)}
 			</Box>
 		</Box>
 	);

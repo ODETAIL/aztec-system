@@ -21,6 +21,7 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useGetCustomersQuery } from "state/api";
+import { jobType, vehicleType } from "utilities/constants";
 
 const newAppointmentSchema = yup.object().shape({
 	title: yup.string().required("required"),
@@ -32,6 +33,7 @@ const newAppointmentSchema = yup.object().shape({
 	email: yup.string().email("invalid email").required("required"),
 	phoneNumber: yup.string(),
 	vtype: yup.string(),
+	jtype: yup.string(),
 	price: yup.string(),
 	notes: yup.string(),
 });
@@ -46,15 +48,15 @@ const initialValueNewAppointment = {
 	email: "",
 	phoneNumber: "",
 	vtype: "",
+	jtype: "",
 	price: "",
 	notes: "",
 };
 
-const vehicleType = ["Suv", "Truck", "Sedan", "Minivan"];
-
 const Form = ({ setOpenModal, openModal, onAppointmentAdded }) => {
 	const [selectedCustomer, setSelectedCustomer] = useState("");
 	const [selectedType, setSelectedType] = useState("");
+	const [selectedJobType, setSelectedJobType] = useState("");
 	const { palette } = useTheme();
 	const isNonMobile = useMediaQuery("(min-width: 600px)");
 	const { data, isLoading } = useGetCustomersQuery({ search: "" });
@@ -86,7 +88,7 @@ const Form = ({ setOpenModal, openModal, onAppointmentAdded }) => {
 						onClose={() => setOpenModal(false)}
 						sx={{
 							"& .MuiPaper-root": {
-								backgroundColor: palette.background.alt,
+								backgroundColor: palette.primary[600],
 							},
 						}}
 					>
@@ -344,6 +346,72 @@ const Form = ({ setOpenModal, openModal, onAppointmentAdded }) => {
 											{touched.type && errors.type}
 										</FormControl>
 
+										<FormControl
+											fullWidth
+											sx={{ gridColumn: "span 2" }}
+											error={
+												Boolean(touched.type) &&
+												Boolean(errors.type)
+											}
+										>
+											<InputLabel id="jtype-label">
+												Job Type
+											</InputLabel>
+											{
+												<Select
+													labelId="jtype-label"
+													name="jtype"
+													onBlur={handleBlur}
+													onChange={(event) => {
+														setFieldValue(
+															"jtype",
+															event.target.value,
+															true
+														);
+														setSelectedJobType(
+															event.target.value
+														);
+													}}
+													value={selectedJobType}
+													MenuProps={{
+														PaperProps: {
+															style: {
+																backgroundColor:
+																	palette
+																		.primary[600], // Change dropdown background color
+																color: palette
+																	.secondary[100], // Change dropdown text color
+																maxHeight: 250,
+															},
+														},
+														anchorOrigin: {
+															vertical: "bottom",
+															horizontal: "left",
+														},
+														transformOrigin: {
+															vertical: "top",
+															horizontal: "left",
+														},
+													}}
+												>
+													{/* List job type */}
+													{jobType?.map(
+														(jtype, index) => (
+															<MenuItem
+																key={index}
+																value={jtype}
+															>
+																{jtype}
+															</MenuItem>
+														)
+													)}
+												</Select>
+											}
+
+											{/* Display error if there is one */}
+											{touched.type && errors.type}
+										</FormControl>
+
 										<TextField
 											label="Code"
 											onBlur={handleBlur}
@@ -427,7 +495,7 @@ const Form = ({ setOpenModal, openModal, onAppointmentAdded }) => {
 												touched.notes && errors.notes
 											}
 											sx={{
-												gridColumn: "span 4",
+												gridColumn: "span 2",
 											}}
 										/>
 									</Box>
@@ -441,8 +509,8 @@ const Form = ({ setOpenModal, openModal, onAppointmentAdded }) => {
 												m: "2rem 0",
 												p: "1rem",
 												backgroundColor:
-													palette.secondary[100],
-												color: palette.background.alt,
+													palette.secondary[300],
+												color: palette.primary[600],
 												"&:hover": {
 													color: palette.primary.main,
 												},

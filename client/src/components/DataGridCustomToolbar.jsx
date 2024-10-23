@@ -1,6 +1,12 @@
 import React from "react";
 import { Search, PersonAddAlt1Outlined } from "@mui/icons-material";
-import { IconButton, TextField, InputAdornment, Button } from "@mui/material";
+import {
+	IconButton,
+	TextField,
+	InputAdornment,
+	Button,
+	useTheme,
+} from "@mui/material";
 import { GridToolbarContainer, GridToolbarExport } from "@mui/x-data-grid";
 import FlexBetween from "./FlexBetween";
 
@@ -11,6 +17,7 @@ const DataGridCustomToolbar = ({
 	setOpenModal,
 	openModel,
 }) => {
+	const theme = useTheme();
 	return (
 		<GridToolbarContainer>
 			<FlexBetween width="100%">
@@ -41,10 +48,15 @@ const DataGridCustomToolbar = ({
 					/>
 					<Button
 						variant="contained"
-						color="primary"
 						startIcon={<PersonAddAlt1Outlined />}
-						onClick={() => setOpenModal(!openModel)}
-						sx={{ ml: 2 }}
+						onClick={() => {
+							setOpenModal(!openModel);
+						}}
+						sx={{
+							ml: 2,
+							backgroundColor: theme.palette.secondary[300],
+							color: theme.palette.primary[600],
+						}}
 					>
 						NEW
 					</Button>

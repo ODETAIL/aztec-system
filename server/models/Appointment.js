@@ -21,6 +21,7 @@ const AppointmentSchema = new mongoose.Schema(
 			phoneNumber: String,
 			code: String,
 			vtype: String,
+			jtype: String,
 			price: String,
 			notes: String,
 		},

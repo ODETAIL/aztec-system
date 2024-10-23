@@ -5,9 +5,11 @@ import { useSelector } from "react-redux";
 import Navbar from "components/Navbar";
 import Sidebar from "components/Sidebar";
 import { useGetUserQuery } from "state/api";
+import View from "scenes/invoices/View";
 
 const Layout = () => {
 	const [user, setUser] = useState(null);
+	const { isInvoiceOpen } = useSelector((state) => state.invoice);
 	const navigate = useNavigate();
 	const isNonMobile = useMediaQuery("(min-width: 600px)");
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -42,14 +44,16 @@ const Layout = () => {
 				isSidebarOpen={isSidebarOpen}
 				setIsSidebarOpen={setIsSidebarOpen}
 			/>
-			<Box flexGrow={1}>
+			<Box width={isInvoiceOpen ? "75%" : "100%"}>
 				<Navbar
 					user={user || {}}
 					isSidebarOpen={isSidebarOpen}
 					setIsSidebarOpen={setIsSidebarOpen}
 				/>
+
 				<Outlet />
 			</Box>
+			<Box>{isInvoiceOpen && <View />}</Box>
 		</Box>
 	);
 };

@@ -169,10 +169,40 @@ export const getInvoices = async (req, res) => {
 };
 
 export const addInvoice = async (req, res) => {
-	// try {
-	// 	const invoices = await Invoice.find();
-	// 	res.status(200).json(invoices);
-	// } catch (error) {
-	// 	res.status(404).json({ message: error.message });
-	// }
+	try {
+		const newInvoice = new Invoice(req.body);
+
+		const savedCustomer = await newInvoice.save();
+		res.status(201).json(savedCustomer);
+	} catch (error) {
+		res.status(404).json({ message: error.message });
+	}
+};
+
+export const editInvoice = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const updatedData = req.body;
+		const updatedInvoice = await Invoice.findByIdAndUpdate(
+			id,
+			updatedData,
+			{ new: true, runValidators: true }
+		);
+		res.status(200).json({
+			success: true,
+			message: { updatedInvoice },
+		});
+	} catch (error) {
+		res.status(404).json({ message: error.message });
+	}
+};
+
+export const deleteInvoice = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const invoice = await Invoice.findByIdAndDelete(id);
+		res.status(200).json({ success: true, message: { invoice } });
+	} catch (error) {
+		res.status(404).json({ message: error.message });
+	}
 };

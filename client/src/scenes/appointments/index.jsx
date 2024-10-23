@@ -22,10 +22,16 @@ import Header from "components/Header";
 import { CloseOutlined, PersonAddAlt1Outlined } from "@mui/icons-material";
 import {
 	useAddAppointmentMutation,
+	useAddInvoiceMutation,
 	useDeleteAppointmentMutation,
 	useGetAppointmentsQuery,
 	useUpdateAppointmentMutation,
 } from "state/api";
+import {
+	generateInvoiceNumber,
+	getCurrentDayFormatted,
+} from "utilities/helpers";
+import { invoiceModel } from "utilities/constants";
 
 const Appointments = () => {
 	const theme = useTheme();
@@ -35,6 +41,7 @@ const Appointments = () => {
 
 	const [openModal, setOpenModal] = useState(false);
 	const [addAppointment] = useAddAppointmentMutation();
+	const [addInvoice] = useAddInvoiceMutation();
 	const [deleteAppointment] = useDeleteAppointmentMutation();
 	const [updateAppointment] = useUpdateAppointmentMutation();
 	const { data, isLoading } = useGetAppointmentsQuery({
@@ -53,7 +60,27 @@ const Appointments = () => {
 	};
 
 	const handleAppointmentAdd = async (data) => {
+		const invoiceData = data.event._def.extendedProps;
+		const newInvoiceObj = {
+			...invoiceModel,
+			invoiceNumber: generateInvoiceNumber(),
+			invoiceDate: getCurrentDayFormatted(),
+			customer: invoiceData.firstName + " " + invoiceData.lastName,
+			code: invoiceData.code,
+			costBeforeGST: invoiceData.price,
+			delete: false,
+			status: "Draft",
+			service: [
+				{
+					vehicleType: invoiceData.vtype,
+					name: invoiceData.jtype,
+					price: invoiceData.price,
+				},
+			],
+		};
+
 		await addAppointment(data.event).unwrap();
+		await addInvoice(newInvoiceObj).unwrap();
 	};
 
 	const handleAppointmentDrop = async (info) => {
@@ -140,9 +167,12 @@ const Appointments = () => {
 						<Typography variant="h5">Events</Typography>
 						<Button
 							variant="contained"
-							color="primary"
 							startIcon={<PersonAddAlt1Outlined />}
 							onClick={() => setOpenModal(!openModal)}
+							sx={{
+								backgroundColor: theme.palette.secondary[300],
+								color: theme.palette.primary[600],
+							}}
 						>
 							{isNonMobile && "NEW"}
 						</Button>

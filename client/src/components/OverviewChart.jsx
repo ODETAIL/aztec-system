@@ -88,7 +88,12 @@ const OverviewChart = ({ isDashboard = false, view }) => {
 				stacked: false,
 				reverse: false,
 			}}
-			yFormat=" >-.2f"
+			yFormat={(value) =>
+				`$${value.toLocaleString(undefined, {
+					minimumFractionDigits: 2,
+					maximumFractionDigits: 2,
+				})}`
+			}
 			curve="catmullRom"
 			enableArea={isDashboard}
 			axisTop={null}
@@ -126,6 +131,13 @@ const OverviewChart = ({ isDashboard = false, view }) => {
 			pointColor={{ theme: "background" }}
 			pointBorderWidth={2}
 			pointBorderColor={{ from: "serieColor" }}
+			enablePointLabel={true}
+			pointLabel={(point) =>
+				`$${point.y.toLocaleString(undefined, {
+					minimumFractionDigits: 2,
+					maximumFractionDigits: 2,
+				})}`
+			}
 			pointLabelYOffset={-12}
 			useMesh={true}
 			legends={

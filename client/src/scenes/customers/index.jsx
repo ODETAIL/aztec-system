@@ -83,15 +83,15 @@ const Customers = () => {
 					},
 					"& .MuiDataGrid-columnHeaders": {
 						"--DataGrid-containerBackground":
-							theme.palette.background.alt,
+							theme.palette.primary[700],
 						color: theme.palette.secondary[100],
 						borderBottom: "none",
 					},
 					"& .MuiDataGrid-virtualScroller": {
-						backgroundColor: theme.palette.primary.light,
+						backgroundColor: theme.palette.primary[600],
 					},
 					"& .MuiDataGrid-footerContainer": {
-						backgroundColor: theme.palette.background.alt,
+						backgroundColor: theme.palette.primary[700],
 						color: theme.palette.secondary[100],
 						borderTop: "none",
 					},
