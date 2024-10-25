@@ -131,7 +131,7 @@ const OverviewChart = ({ isDashboard = false, view }) => {
 			pointColor={{ theme: "background" }}
 			pointBorderWidth={2}
 			pointBorderColor={{ from: "serieColor" }}
-			enablePointLabel={true}
+			// enablePointLabel={true}
 			pointLabel={(point) =>
 				`$${point.y.toLocaleString(undefined, {
 					minimumFractionDigits: 2,

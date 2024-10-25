@@ -40,6 +40,17 @@ export const tokensDark = {
 		800: "#665429",
 		900: "#332a14",
 	},
+	greenAccent: {
+		100: "#0f2922",
+		200: "#1e5245",
+		300: "#2e7c67",
+		400: "#3da58a",
+		500: "#4cceac",
+		600: "#70d8bd",
+		700: "#94e2cd",
+		800: "#b7ebde",
+		900: "#dbf5ee",
+	},
 };
 
 // function that reverses the color palette

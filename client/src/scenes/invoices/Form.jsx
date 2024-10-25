@@ -17,7 +17,12 @@ import {
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { invoiceStatusType, jobType, vehicleType } from "utilities/constants";
+import {
+	invoiceStatusType,
+	invoiceType,
+	jobType,
+	vehicleType,
+} from "utilities/constants";
 import { useAddInvoiceMutation, useUpdateInvoiceMutation } from "state/api";
 import {
 	generateInvoiceNumber,
@@ -35,6 +40,8 @@ const newInvoiceSchema = yup.object().shape({
 			price: yup.number(),
 		})
 	),
+	invoiceType: yup.string(),
+	custom: yup.string(),
 	code: yup.string(),
 	year: yup.string(),
 	makemodel: yup.string(),
@@ -53,6 +60,9 @@ const Form = ({ setOpenModal, openModal, existingInvoice }) => {
 	const [selectedStatus, setSelectedStatus] = useState(
 		existingInvoice?.status || ""
 	);
+	const [selectedInvoiceType, setSelectedInvoiceType] = useState(
+		existingInvoice?.invoiceType || ""
+	);
 	let isEditing = Boolean(existingInvoice);
 
 	const initialValueNewInvoice = {
@@ -62,6 +72,8 @@ const Form = ({ setOpenModal, openModal, existingInvoice }) => {
 		code: existingInvoice?.code || "",
 		year: existingInvoice?.year || "",
 		makemodel: existingInvoice?.makemodel || "",
+		invoiceType: existingInvoice?.invoiceType || "",
+		custom: existingInvoice?.custom || "",
 		delete: existingInvoice?.delete || false,
 	};
 
@@ -295,6 +307,90 @@ const Form = ({ setOpenModal, openModal, existingInvoice }) => {
 										{/* Display error if there is one */}
 										{touched.status && errors.status}
 									</FormControl>
+
+									<FormControl
+										fullWidth
+										sx={{ gridColumn: "span 2" }}
+										error={
+											Boolean(touched.invoiceType) &&
+											Boolean(errors.invoiceType)
+										}
+									>
+										<InputLabel id="invoiceType-label">
+											Invoice Type
+										</InputLabel>
+										{
+											<Select
+												labelId="invoiceType-label"
+												name="invoiceType"
+												onBlur={handleBlur}
+												onChange={(event) => {
+													setFieldValue(
+														"invoiceType",
+														event.target.value,
+														true
+													);
+													setSelectedInvoiceType(
+														event.target.value
+													);
+												}}
+												value={selectedInvoiceType}
+												MenuProps={{
+													PaperProps: {
+														style: {
+															backgroundColor:
+																palette
+																	.primary[600], // Change dropdown background color
+															color: palette
+																.secondary[100], // Change dropdown text color
+															maxHeight: 250,
+														},
+													},
+													anchorOrigin: {
+														vertical: "bottom",
+														horizontal: "left",
+													},
+													transformOrigin: {
+														vertical: "top",
+														horizontal: "left",
+													},
+												}}
+											>
+												{/* List invoice type */}
+												{invoiceType?.map(
+													(iType, index) => (
+														<MenuItem
+															key={index}
+															value={iType}
+														>
+															{iType}
+														</MenuItem>
+													)
+												)}
+											</Select>
+										}
+
+										{/* Display error if there is one */}
+										{touched.status && errors.status}
+									</FormControl>
+
+									<TextField
+										label="Custom"
+										onBlur={handleBlur}
+										onChange={handleChange}
+										value={values.custom ?? ""}
+										name="custom"
+										error={
+											Boolean(touched.custom) &&
+											Boolean(errors.custom)
+										}
+										helperText={
+											touched.custom && errors.custom
+										}
+										sx={{
+											gridColumn: "span 2",
+										}}
+									/>
 
 									<FormControl
 										fullWidth

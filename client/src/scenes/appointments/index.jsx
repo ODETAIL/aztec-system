@@ -79,8 +79,12 @@ const Appointments = () => {
 			],
 		};
 
-		await addAppointment(data.event).unwrap();
-		await addInvoice(newInvoiceObj).unwrap();
+		await addAppointment(data.event)
+			.unwrap()
+			.then(() => addInvoice(newInvoiceObj).unwrap())
+			.catch((error) =>
+				console.error("Error adding appointment or invoice:", error)
+			);
 	};
 
 	const handleAppointmentDrop = async (info) => {

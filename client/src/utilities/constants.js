@@ -1,4 +1,5 @@
 export const vehicleType = ["Suv", "Truck", "Sedan", "Minivan", "Convertible"];
+export const invoiceType = ["A", "M", "O"];
 export const invoiceStatusType = ["Draft", "Pending", "Paid", "Overdue"];
 export const jobType = [
 	"Windshield",
